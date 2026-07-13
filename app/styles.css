@@ -1,0 +1,179 @@
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface-2: #21262d;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #2f81f7;
+  --high: #f85149;
+  --medium: #d29922;
+  --low: #3fb950;
+  --radius: 8px;
+  --gap: 12px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.app-header {
+  padding: 32px 24px 8px;
+  text-align: center;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+}
+
+.tagline {
+  margin: 4px 0 0;
+  color: var(--muted);
+}
+
+.app-main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px 24px 48px;
+}
+
+.add-form {
+  display: flex;
+  gap: var(--gap);
+  margin-bottom: 20px;
+}
+
+.add-form input[type="text"] {
+  flex: 1;
+}
+
+input,
+select,
+button {
+  font: inherit;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+button {
+  cursor: pointer;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+button:hover {
+  filter: brightness(1.08);
+}
+
+.stats {
+  display: flex;
+  gap: var(--gap);
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.filter {
+  background: var(--surface-2);
+  border-color: var(--border);
+  color: var(--text);
+  font-weight: 500;
+}
+
+.filter.is-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-left-width: 4px;
+  border-radius: var(--radius);
+}
+
+.task[data-priority="high"] {
+  border-left-color: var(--high);
+}
+.task[data-priority="medium"] {
+  border-left-color: var(--medium);
+}
+.task[data-priority="low"] {
+  border-left-color: var(--low);
+}
+
+.task.is-done .task-title {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.task-title {
+  flex: 1;
+}
+
+.task-status {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.task-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.task-actions button {
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  background: var(--surface-2);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.task-actions .delete {
+  color: var(--high);
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--muted);
+  padding: 32px 0;
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DevTasks — Prompt Architecture Demo</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <h1>DevTasks</h1>
+      <p class="tagline">A tiny task board for practicing prompt architecture.</p>
+    </header>
+
+    <main class="app-main">
+      <section class="add-panel" aria-label="Add a task">
+        <form id="add-form" class="add-form">
+          <input
+            id="task-title"
+            name="title"
+            type="text"
+            placeholder="What needs doing?"
+            autocomplete="off"
+            required
+          />
+          <select id="task-priority" name="priority" aria-label="Priority">
+            <option value="low">Low</option>
+            <option value="medium" selected>Medium</option>
+            <option value="high">High</option>
+          </select>
+          <button type="submit">Add task</button>
+        </form>
+      </section>
+
+      <section class="stats" aria-label="Task summary">
+        <span id="stat-total" class="stat">0 total</span>
+        <span id="stat-todo" class="stat">0 to do</span>
+        <span id="stat-doing" class="stat">0 doing</span>
+        <span id="stat-done" class="stat">0 done</span>
+      </section>
+
+      <nav class="filters" aria-label="Filter tasks">
+        <button class="filter is-active" data-filter="all">All</button>
+        <button class="filter" data-filter="todo">To do</button>
+        <button class="filter" data-filter="doing">Doing</button>
+        <button class="filter" data-filter="done">Done</button>
+      </nav>
+
+      <ul id="task-list" class="task-list" aria-live="polite"></ul>
+      <p id="empty-state" class="empty-state" hidden>No tasks yet — add one above.</p>
+    </main>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

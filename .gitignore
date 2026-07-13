@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+
+# ---------------------------------------------------------------------------
+# Instructor-only materials — NOT for attendees.
+# The instructor guide is published separately as a private Gist, and the
+# slide deck is delivered live. Keep both out of the attendee repo.
+# ---------------------------------------------------------------------------
+instructor/

@@ -1,0 +1,11 @@
+{
+  "name": "devtasks",
+  "version": "1.0.0",
+  "description": "A tiny task board for practicing prompt architecture with GitHub Copilot.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "node --test",
+    "serve": "npx --yes serve app"
+  }
+}
