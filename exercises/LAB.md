@@ -1,205 +1,205 @@
-# Lab: From Basic Prompting to Context Engineering
+# Lab: Engineering Reusable Copilot Context
 
-Work through these exercises in order. Each one engineers **more of the context**
-the model sees, and makes the result more deterministic. Keep the `npm test`
-terminal open the whole time.
+This lab follows the demonstration after the informational slides. It assumes
+you already use Copilot Chat, can inspect a diff, and can run tests. The focus is
+how instructions, prompt files, evidence, and agent tools control a workflow.
 
-> Goal: feel the shift from "write a better message" to "engineer the context
-> window" — and see how to put it into place in a real repo.
+## Setup
 
----
-
-## Exercise 0 — Warm up (2 min)
+From the repository root:
 
 ```bash
 npm test
-npm run serve   # open http://localhost:3000
 ```
 
-Add a few tasks, advance them, and delete one. Confirm the app works.
+Expected baseline: 8 tests pass.
 
----
+After each exercise, reset only the demo application:
 
-## Exercise 1 — Prompt engineering by hand (7 min)
+```bash
+git restore app/
+git clean -fd app/
+npm test
+```
 
-First, the naive prompt. In Copilot Chat, ask:
+## 1. Inspect scoped instructions
 
-> Add a way to filter tasks by priority.
+Open these files side by side:
 
-Note where it puts code, whether it wrote tests, and whether you'd merge it.
-Undo (`git checkout .`).
+- `.github/instructions/javascript.instructions.md`
+- `app/src/store.js`
 
-Now apply GitHub's
-[prompt-engineering techniques](https://docs.github.com/en/copilot/concepts/prompting/prompt-engineering)
-**deliberately** in a single, better prompt:
+Find the instruction's routing rule:
 
-> **[start general, then specific]** Add priority filtering to the DevTasks store.
-> **[indicate relevant code]** Put the logic in `app/src/store.js` (see `#filterTasks`).
-> **[break tasks down]** 1) add a pure `filterByPriority(tasks, priority)` function;
-> 2) validate the priority; 3) add tests.
-> **[give examples]** `filterByPriority(tasks, "high")` returns only high-priority tasks;
-> an invalid priority should throw.
-> **[avoid ambiguity]** "priority" is one of `low` \| `medium` \| `high`.
+```yaml
+applyTo: "app/**/*.js"
+```
 
-**Compare the two.** The engineered prompt is clearly better — *and* notice how
-much you had to remember and re-type. Would a teammate phrase all five the same
-way? This is the ceiling of by-hand prompting.
+In Copilot Chat **Ask** mode, enter exactly:
 
-Undo changes (`git checkout .`).
+```text
+For app/src/store.js, propose the signature and implementation rules for a new
+filterByPriority function. Do not edit files. List which active repository
+instructions influenced your answer.
+```
 
-> **Takeaway:** the techniques work. The problem is they live in your head and
-> get re-typed every time. The next exercises **encode** them into files.
+Check the response for:
 
----
+- pure business logic in `store.js`
+- immutable array handling
+- validation with a clear error
+- JSDoc on the exported function
 
-## Exercise 2 — Instructions as engineered context (5 min)
+Open Chat's references panel. Confirm the repository and scoped instructions
+are present. The important behavior is conditional context selection, not the
+specific implementation proposed.
 
-Look at:
+## 2. Evaluate and run a composed prompt
 
-- [.github/copilot-instructions.md](../.github/copilot-instructions.md)
-- [.github/instructions/javascript.instructions.md](../.github/instructions/javascript.instructions.md)
-- [.github/instructions/testing.instructions.md](../.github/instructions/testing.instructions.md)
+Open `.github/prompts/add-feature.prompt.md`. Identify:
 
-Open `app/src/store.js`. Notice the JavaScript instruction auto-attaches because
-its `applyTo: "app/**/*.js"` glob matches — that's **context injected on
-condition**, not typed by you.
+1. the input parameter
+2. linked source and instruction files
+3. the ordered implementation steps
+4. command access for verification
+5. the final output contract
 
-Now ask the **same** informal prompt again:
+In Copilot Chat, enter exactly:
 
-> Add a way to filter tasks by priority.
+```text
+/add-feature Add a pure filterByPriority(tasks, priority) function. Accept low,
+medium, and high. Return only matching tasks without mutating the input. Throw
+for any other priority. Store logic and tests only; do not change the UI.
+```
 
-Notice how the output now respects the architecture (pure function in `store.js`),
-uses `const`, immutable updates, JSDoc, and matches the test style — without you
-saying so. **You didn't write a better prompt; you engineered the context so the
-same prompt succeeds.** (This is "follow good coding practices" + "avoid
-ambiguity", encoded once instead of re-typed.)
+If prompted to confirm the criteria, reply:
 
-Undo changes (`git checkout .`).
+```text
+Proceed. The criteria are testable. Keep the change limited to app/src/store.js
+and app/tests/store.test.js.
+```
 
----
+Verify independently:
 
-## Exercise 3 — A repeatable prompt (8 min)
+```bash
+npm test
+git diff -- app/src/store.js app/tests/store.test.js
+```
 
-In Chat, run the prompt file:
+Check that:
 
-> `/add-feature filter tasks by priority`
+- `filterByPriority` is exported and documented
+- accepted priorities are `low`, `medium`, and `high`
+- invalid input throws
+- tests cover matching, invalid input, and input immutability
+- the UI was not changed
+- the final response reports files, acceptance-criteria coverage, and test result
 
-Open [.github/prompts/add-feature.prompt.md](../.github/prompts/add-feature.prompt.md)
-and find the Markdown links to `store.js`, `ui.js`, and the instruction files.
-Those links **pull the exact right files into context on every run** — you never
-have to remember to attach them. That is context engineering, not luck.
+The code may differ between runs. The stable contract is placement, criteria,
+evidence, and output shape.
 
-Compare to Exercise 1. The prompt also enforces a **sequence**: restate scope →
-implement in the right seam → add tests → run `npm test` → summarize.
+Reset the app before continuing.
 
-This single file encodes the techniques you re-typed by hand in Exercise 1:
-**start general then specific** (restate scope), **break tasks down** (the
-numbered steps), **indicate relevant code** (the file links), and **give
-examples** (the test conventions).
+## 3. Run a test-first, self-verifying workflow
 
-Run it a second time with a different feature:
+Open `.github/prompts/spec-first.prompt.md`. Find the ordered **Red**, **Green**,
+**Refactor**, and **Verify** steps.
 
-> `/add-feature mark all tasks done`
+Enter exactly:
 
-Same curated context, same structure, same quality bar. **This is determinism:
-same shape of output every time, regardless of who runs it.**
+```text
+/spec-first Add toggleTaskStarred(tasks, id). A task starts with no starred
+property. Toggling a matching task returns a new array and a new task object
+with starred true; toggling again sets starred false. Non-matching tasks retain
+their references. An unknown id leaves values unchanged. Tests must prove input
+immutability.
+```
 
----
+If prompted to confirm test cases, reply:
 
-## Exercise 4 — Generate tests deterministically (5 min)
+```text
+Proceed with those observable test cases. Preserve the Red, Green, Refactor,
+and Verify order and include both test command summaries.
+```
 
-Pick a function and run:
+Observe and record:
 
-> `/generate-tests summarize`
+- the first failing test and why it failed
+- whether tests existed before implementation
+- the final passing test summary
+- whether the response reported both red and green evidence
 
-Confirm it produces happy-path, boundary, and error cases, then runs `npm test`.
+A passing final run is not sufficient by itself. The failing run proves the new
+test can detect missing behavior.
 
----
+Reset the app before continuing.
 
-## Exercise 5 — A scoped reviewer (5 min)
+## 4. Use an independent read-only reviewer
 
-Make a deliberately sloppy change (e.g., mutate the array in `deleteTask`).
-Then:
+In `app/src/store.js`, replace `deleteTask` with:
 
-1. Run `/code-review #changes` — get a structured findings table.
-2. Switch to the **Spec Reviewer** agent and ask it to review your change.
+```js
+export function deleteTask(tasks, id) {
+  const index = tasks.findIndex((task) => task.id === id);
+  if (index !== -1) {
+    tasks.splice(index, 1);
+  }
+  return tasks;
+}
+```
 
-Notice it is **read-only** and returns an `APPROVE` / `REQUEST CHANGES` verdict.
-Restore the file when done (`git checkout .`).
+Inspect the change:
 
----
+```bash
+git diff -- app/src/store.js
+```
 
-# Advanced track
+Select the **Spec Reviewer** agent and enter exactly:
 
-These exercises show skilled prompt-engineering practices. Do any subset.
+```text
+Review #changes for merge readiness. Apply the DevTasks architecture,
+immutability, conventions, and test-coverage rules. Do not edit files. Return
+the required evidence table and verdict.
+```
 
-## Exercise 6 — Test-first, self-verifying (8 min)
+Confirm that the response:
 
-Run the spec-driven loop:
+- identifies `tasks.splice(...)` as input mutation
+- cites `app/src/store.js`
+- discusses missing immutability coverage where applicable
+- returns `REQUEST CHANGES`
+- does not edit any files
 
-> `/spec-first tasks can be starred; starred tasks sort to the top`
+Open `.github/agents/spec-reviewer.agent.md` and inspect:
 
-Watch the phases: it writes tests **first**, runs `npm test` to show them
-**fail (red)**, implements to **green**, then refactors. The prompt grounds
-itself in the real test output instead of assuming success.
+```yaml
+tools: [read, search, changes]
+```
 
-**Why it's advanced:** tests-as-specification + a self-verifying loop. The model
-can't claim "done" — the tool result proves it. `git checkout .`
+The tool list preserves separation between implementation and review: this
+agent can inspect and decide, but cannot repair its own findings.
 
-## Exercise 7 — Behavior-locked refactor (6 min)
+Reset the app and confirm 8 tests pass.
 
-> `/refactor summarize`
+## 5. Apply the pattern to your team
 
-The prompt records a `npm test` baseline, refactors for readability only, then
-proves the results are **identical**. Try asking it to also "add a feature" —
-notice it refuses; the negative constraints hold the line. `git checkout .`
+Choose one recurring Copilot workflow from your own repository and classify it:
 
-## Exercise 8 — Output contract + grounding (5 min)
+| Need | Customization |
+|---|---|
+| Repository-wide facts | `copilot-instructions.md` |
+| Rules for matching files | `*.instructions.md` with a narrow `applyTo` |
+| Repeatable task | `*.prompt.md` with references, steps, and evidence |
+| Specialized role | `*.agent.md` with the minimum required tools |
 
-Make a small change, then:
+Before adopting it, answer:
 
-> `/commit-message`
+- What source owns each rule?
+- What should be linked rather than duplicated?
+- Which command or diff can falsify success?
+- What output shape does the next reviewer or tool need?
+- Which tools are unnecessary for this role?
 
-It reads `#changes` (the diff, not your description) and returns **only** a
-Conventional Commits block, shaped by the few-shot examples in the prompt file.
-Structured output like this is diffable and automatable. `git checkout .`
-
-## Exercise 9 — Orchestration & handoff (6 min)
-
-Select the **Feature Planner** agent and ask:
-
-> Plan: let users archive completed tasks.
-
-It stays **read-only**, decomposes the work into `action → file → proof (test)`,
-lists risks, and recommends handing off to `/spec-first` then the **Spec
-Reviewer**. Follow the handoff to see a scoped multi-agent workflow.
-
-## Exercise 10 — Grounding & iterate (5 min)
-
-Ask a repo-wide question with explicit grounding:
-
-> Using `#codebase`, where is task status advanced, and what would break if I
-> added a fourth status?
-
-Then **iterate** on the answer by refining the *reference* (add `#file` links),
-not just re-wording the question.
-
----
-
-## Wrap-up
-
-You went from a prompt no one could reproduce to a small library of curated
-context that anyone on the team can run and get consistent, reviewable results.
-
-- Basic prompt → context is whatever you happened to type
-- Instructions → persistent + conditional context, applied automatically
-- Prompt files → the right files + process pulled into context, repeatably
-- Custom agent → bounded context and tools for one job
-- Advanced: output contracts, test-first loops, guarded refactors, grounding,
-  and multi-agent orchestration — each encoded once and reused
-
-### Put it into place this week
-
-Pick your team's **most repeated** Copilot request and turn it into one prompt
-file. Move one "we always do it this way" rule into an instruction file with a
-scoped `applyTo`. Open a PR for both and review them like code.
+Treat the resulting customization as code: review it in a PR, rehearse it on a
+small set of representative tasks, and remove context that stops earning its
+place.
