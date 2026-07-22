@@ -56,6 +56,12 @@ specific implementation proposed.
 
 ## 2. Evaluate and run a composed prompt
 
+> **Note:** Prompt files are the **prototype tier** for a workflow — one
+> developer's canned task, easy to write, easy to iterate. We're using one here
+> because it makes the composition, grounding, and stop-signal techniques
+> visible in a single file. In your own team, once a workflow is shared,
+> promote it to an agent or a skill (section 4 shows the agent version).
+
 Open `.github/prompts/add-feature.prompt.md`. Identify:
 
 1. the input parameter
@@ -63,6 +69,10 @@ Open `.github/prompts/add-feature.prompt.md`. Identify:
 3. the ordered implementation steps
 4. command access for verification
 5. the final output contract
+6. the **stop signal** in step 1 ("Stop and confirm the criteria are testable
+   before coding") and the negative constraint on the last line ("Do not mutate
+   inputs"). These prevent the agent from over-building beyond what you asked
+   for.
 
 In Copilot Chat, enter exactly:
 
@@ -177,20 +187,27 @@ tools: [read, search, changes]
 ```
 
 The tool list preserves separation between implementation and review: this
-agent can inspect and decide, but cannot repair its own findings.
+agent can inspect and decide, but cannot repair its own findings. It is also
+the strongest form of **stop signal** — expressed as capability rather than
+instruction. The reviewer physically cannot rewrite the code it judges, even
+if the model would like to "be helpful" and fix the mutation. This is why we
+recommend agents (and skills) over prompt files for anything a team shares:
+they let you enforce boundaries, not just request them.
 
 Reset the app and confirm 8 tests pass.
 
 ## 5. Apply the pattern to your team
 
-Choose one recurring Copilot workflow from your own repository and classify it:
+Choose one recurring Copilot workflow from your own repository and classify it.
+Prefer the top of this table for anything a team will share:
 
 | Need | Customization |
 |---|---|
-| Repository-wide facts | `copilot-instructions.md` |
+| **Specialized role, shared by a team** | **`*.agent.md` with the minimum required tools** *(strongest stop signals)* |
+| **Multi-step workflow with bundled assets** | **`SKILL.md`** the model invokes by name |
 | Rules for matching files | `*.instructions.md` with a narrow `applyTo` |
-| Repeatable task | `*.prompt.md` with references, steps, and evidence |
-| Specialized role | `*.agent.md` with the minimum required tools |
+| Repository-wide facts | `copilot-instructions.md` |
+| One person's canned task | `*.prompt.md` with references, steps, and evidence *(prototype tier — promote to an agent or skill when shared)* |
 
 Before adopting it, answer:
 
@@ -199,6 +216,8 @@ Before adopting it, answer:
 - Which command or diff can falsify success?
 - What output shape does the next reviewer or tool need?
 - Which tools are unnecessary for this role?
+- **Where are the stop signals?** Pause-and-confirm steps, negative constraints,
+  and tool caps — so the model builds what you asked for and nothing more.
 
 Treat the resulting customization as code: review it in a PR, rehearse it on a
 small set of representative tasks, and remove context that stops earning its

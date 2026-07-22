@@ -10,10 +10,16 @@ results, and scope — the same way every time.
 
 | Primitive | File | Part of the context window it engineers |
 |-----------|------|------------------------------------------|
+| **Custom agents** *(start here for shared workflows)* | [.github/agents/](.github/agents/) | Bounded scope, tools, and stop signals for a role |
+| **Skills** *(bundle multi-step workflows)* | `SKILL.md` (see [skills docs](https://code.visualstudio.com/docs/copilot/customization/skills)) | Reusable procedures + assets a model can invoke by name |
 | Project instructions | [.github/copilot-instructions.md](.github/copilot-instructions.md) | Persistent, always-on project context |
 | File instructions | [.github/instructions/](.github/instructions/) | Conventions injected conditionally via `applyTo` |
-| Prompt files | [.github/prompts/](.github/prompts/) | The right files + process, pulled in repeatably (`/add-feature`, `/generate-tests`, `/code-review`) |
-| Custom agent | [.github/agents/spec-reviewer.agent.md](.github/agents/spec-reviewer.agent.md) | Bounded scope + tools for one job |
+| Prompt files *(useful, but prefer agents/skills for team-wide reuse)* | [.github/prompts/](.github/prompts/) | Canned tasks a single user runs from Chat (`/add-feature`, `/generate-tests`, `/code-review`) |
+
+> **Where to invest first:** Reach for a **custom agent** or a **skill** for anything a
+> team will use more than once. Prompt files are a fine on-ramp for a single developer's
+> canned task, but they don't carry tool boundaries, handoffs, or stop signals the way
+> agents and skills do — so they tend to drift as workflows mature.
 
 ## Prompt engineering fundamentals
 
@@ -58,24 +64,31 @@ A small task board with immutable, testable business logic:
 
 ## Try the prompts
 
-In Copilot Chat, type `/` and pick one.
+In Copilot Chat, select an **agent** from the picker first — that's the pattern we
+recommend for anything a team will share:
 
-**Core:**
+- **Spec Reviewer** — strict, read-only merge review (`APPROVE` / `REQUEST CHANGES`);
+  tool scope acts as a **stop signal** so it can't rewrite the code it's judging
+- **Feature Planner** — decomposes a request into a testable checklist, then hands off
+  to implementation + review (multi-stage workflow with per-stage stop signals)
+
+If you want to see the older prompt-file style, type `/` in Chat:
+
+**Core prompts:**
 
 - `/add-feature` — add a feature the repeatable way (scope → implement → test → verify)
 - `/generate-tests` — generate a deterministic test suite for a `store.js` function
 - `/code-review` — structured review against the repo's rules
 
-**Advanced:**
+**Advanced prompts:**
 
-- `/spec-first` — test-first loop: failing tests from a spec, then implement to green (self-verifying)
+- `/spec-first` — test-first loop: failing tests from a spec, then implement to green
 - `/refactor` — behavior-preserving refactor, locked by the existing test suite
-- `/commit-message` — Conventional Commits output contract, grounded in `#changes` with few-shot examples
+- `/commit-message` — Conventional Commits output contract, grounded in `#changes`
 
-Then select an agent from the picker:
-
-- **Spec Reviewer** — strict, read-only merge review (`APPROVE` / `REQUEST CHANGES`)
-- **Feature Planner** — decomposes a request into a testable checklist and hands off to implementation + review
+> Prompt files are still useful, but treat them as scaffolding — once a workflow is
+> shared, promote it to an **agent** (for tool boundaries and stop signals) or a
+> **skill** (for a bundled multi-step procedure).
 
 ## Advanced techniques on show
 
@@ -83,6 +96,7 @@ Each file demonstrates a skilled prompt-engineering practice you can copy:
 
 | Technique | Where |
 |-----------|-------|
+| **Stop signals** (explicit halts + tool caps that prevent over-building) | [add-feature](.github/prompts/add-feature.prompt.md) ("Stop and confirm"), [spec-reviewer](.github/agents/spec-reviewer.agent.md) (`tools: [read, search, changes]`), [refactor](.github/prompts/refactor.prompt.md) (negative constraints) |
 | Output contracts (structured, parseable) | [commit-message](.github/prompts/commit-message.prompt.md), [code-review](.github/prompts/code-review.prompt.md) |
 | Few-shot examples in the prompt | [commit-message](.github/prompts/commit-message.prompt.md) |
 | Test-first / self-verifying loop | [spec-first](.github/prompts/spec-first.prompt.md) |
