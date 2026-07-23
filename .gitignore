@@ -14,4 +14,4 @@ Thumbs.db
 # The instructor guide is published separately as a private Gist, and the
 # slide deck is delivered live. Keep both out of the attendee repo.
 # ---------------------------------------------------------------------------
-instructor/
+extra/
