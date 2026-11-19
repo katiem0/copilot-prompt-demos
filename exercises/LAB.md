@@ -57,10 +57,10 @@ specific implementation proposed.
 ## 2. Evaluate and run a composed prompt
 
 > **Note:** Prompt files are the **prototype tier** for a workflow — one
-> developer's canned task, easy to write, easy to iterate. We're using one here
-> because it makes the composition, grounding, and stop-signal techniques
-> visible in a single file. In your own team, once a workflow is shared,
-> promote it to an agent or a skill (section 4 shows the agent version).
+> developer's canned task, easy to write, easy to iterate. The same workflows
+> now also ship as discoverable skills under `.github/skills/`. Keep the prompt
+> files below as compatibility and learning examples, and prefer a skill or agent
+> when a workflow is shared with a team.
 
 Open `.github/prompts/add-feature.prompt.md`. Identify:
 

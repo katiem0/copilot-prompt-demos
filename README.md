@@ -11,10 +11,10 @@ results, and scope — the same way every time.
 | Primitive | File | Part of the context window it engineers |
 |-----------|------|------------------------------------------|
 | **Custom agents** *(start here for shared workflows)* | [.github/agents/](.github/agents/) | Bounded scope, tools, and stop signals for a role |
-| **Skills** *(bundle multi-step workflows)* | `SKILL.md` (see [skills docs](https://code.visualstudio.com/docs/copilot/customization/skills)) | Reusable procedures + assets a model can invoke by name |
+| **Skills** *(bundle multi-step workflows)* | [.github/skills/](.github/skills/) | Reusable procedures + assets a model can invoke by name |
 | Project instructions | [.github/copilot-instructions.md](.github/copilot-instructions.md) | Persistent, always-on project context |
 | File instructions | [.github/instructions/](.github/instructions/) | Conventions injected conditionally via `applyTo` |
-| Prompt files *(useful, but prefer agents/skills for team-wide reuse)* | [.github/prompts/](.github/prompts/) | Canned tasks a single user runs from Chat (`/add-feature`, `/generate-tests`, `/code-review`) |
+| Prompt files *(compatibility/scaffolding examples)* | [.github/prompts/](.github/prompts/) | Canned task prototypes retained for learning (`/add-feature`, `/generate-tests`, `/code-review`) |
 
 > **Where to invest first:** Reach for a **custom agent** or a **skill** for anything a
 > team will use more than once. Prompt files are a fine on-ramp for a single developer's
@@ -62,29 +62,25 @@ A small task board with immutable, testable business logic:
 - `app/src/main.js` — wiring
 - `app/tests/` — Node built-in tests
 
-## Try the prompts
+## Try the skills
 
-In Copilot Chat, select an **agent** from the picker first — that's the pattern we
-recommend for anything a team will share:
+In Copilot Chat, open Customizations and discover the committed skills:
 
-- **Spec Reviewer** — strict, read-only merge review (`APPROVE` / `REQUEST CHANGES`);
-  tool scope acts as a **stop signal** so it can't rewrite the code it's judging
-- **Feature Planner** — decomposes a request into a testable checklist, then hands off
-  to implementation + review (multi-stage workflow with per-stage stop signals)
+- **Spec-First** — test-first red/green/refactor loop
+- **Add Feature** — bounded feature implementation with confirmation
+- **Generate Tests** — deterministic Node test generation
+- **Code Review** — read-only review report
+- **Safe Refactor** — behavior-preserving refactor guarded by tests
+- **Commit Message** — diff-grounded Conventional Commits output
 
-If you want to see the older prompt-file style, type `/` in Chat:
+Invoke a skill by name or ask naturally for the matching workflow. The repository
+also keeps the original prompt files in [.github/prompts/](.github/prompts/) as
+compatibility examples and for demonstrating how the prompt approach evolved.
 
-**Core prompts:**
+Custom agents remain appropriate for role-specific tool boundaries:
 
-- `/add-feature` — add a feature the repeatable way (scope → implement → test → verify)
-- `/generate-tests` — generate a deterministic test suite for a `store.js` function
-- `/code-review` — structured review against the repo's rules
-
-**Advanced prompts:**
-
-- `/spec-first` — test-first loop: failing tests from a spec, then implement to green
-- `/refactor` — behavior-preserving refactor, locked by the existing test suite
-- `/commit-message` — Conventional Commits output contract, grounded in `#changes`
+- **Spec Reviewer** — strict, read-only merge review
+- **Feature Planner** — grounded plan and implementation handoff
 
 > Prompt files are still useful, but treat them as scaffolding — once a workflow is
 > shared, promote it to an **agent** (for tool boundaries and stop signals) or a
