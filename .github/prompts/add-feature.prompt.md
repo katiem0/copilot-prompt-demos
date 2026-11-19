@@ -3,7 +3,7 @@ description: "Add a feature to the DevTasks store following the repo's architect
 name: "Add Feature"
 argument-hint: "Describe the feature, e.g. 'filter tasks by priority'"
 agent: "agent"
-tools: [read, search, edit, vscode/runCommand]
+tools: [read, search, edit]
 ---
 
 # Add a Feature

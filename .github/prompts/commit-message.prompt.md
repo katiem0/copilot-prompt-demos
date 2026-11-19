@@ -3,7 +3,6 @@ description: "Write a Conventional Commits message for the current staged/workin
 name: "Commit Message"
 argument-hint: "Optional scope hint, e.g. 'store' or 'ui'"
 agent: "ask"
-tools: [changes, search]
 ---
 
 # Commit Message

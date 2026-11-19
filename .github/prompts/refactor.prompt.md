@@ -3,7 +3,7 @@ description: "Behavior-preserving refactor of a store.js function, guarded by th
 name: "Safe Refactor"
 argument-hint: "Function or file to refactor"
 agent: "agent"
-tools: [codebase, search, editFiles, runCommands]
+tools: [search]
 ---
 
 # Safe Refactor

@@ -3,7 +3,7 @@ description: "Generate a deterministic Node test suite for a store.js function f
 name: "Generate Tests"
 argument-hint: "Name of the function to test, e.g. 'filterTasks'"
 agent: "agent"
-tools: [codebase, search, editFiles, runCommands]
+tools: [edit, search]
 ---
 
 # Generate Tests

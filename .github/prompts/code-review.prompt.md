@@ -3,7 +3,7 @@ description: "Review a diff or file against the DevTasks conventions and produce
 name: "Code Review"
 argument-hint: "Path or #changes to review"
 agent: "agent"
-tools: [codebase, search, changes]
+tools: [search]
 ---
 
 # Code Review
